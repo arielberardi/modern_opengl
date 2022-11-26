@@ -16,11 +16,14 @@
 
                 "-I${workspaceFolder}/../Dependencies/GLFW/include",
                 "-I${workspaceFolder}/../Dependencies/GLEW/include",
+                "-I${workspaceFolder}/extern/",
                 "-I${workspaceFolder}/source",
 
                 "-lglfw.3",
                 "-lGLEW.2.2.0",
 
+                "${workspaceFolder}/extern/glm/detail/*.cpp",
+                "${workspaceFolder}/extern/stb_image/*.cpp",
                 "${workspaceFolder}/source/*.cpp",
 
                 "-o",
@@ -60,6 +63,7 @@
 
                 "-I${workspaceFolder}/../Dependencies/GLFW/include",
                 "-I${workspaceFolder}/../Dependencies/GLEW/include",
+                "-I${workspaceFolder}/extern/",
                 "-I${workspaceFolder}/source",
 
                 "-lglfw.3",
@@ -67,6 +71,8 @@
 
                 "-DDEBUG",
 
+                "${workspaceFolder}/extern/glm/detail/*.cpp",
+                "${workspaceFolder}/extern/stb_image/*.cpp",
                 "${workspaceFolder}/source/*.cpp",
 
                 "-o",
