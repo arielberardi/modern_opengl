@@ -5,6 +5,13 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+GLuint uniformXMove;
+
+bool direction = true;
+float triOffset = 0.0f;
+float triMaxoffset = 0.5f;
+float triIncrement = 0.005f;
+
 void AddShader(GLuint program, std::string& shaderCode, GLenum shaderType)
 {
     GLuint shader = glCreateShader(shaderType);
@@ -12,9 +19,8 @@ void AddShader(GLuint program, std::string& shaderCode, GLenum shaderType)
     const GLchar* sourceCode = shaderCode.c_str();
     glShaderSource(shader, 1, &sourceCode, nullptr);
 
-    glCompileShader(shader);
-
     GLint result = 0;
+    glCompileShader(shader);
     glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
     if (!result)
     {
@@ -41,9 +47,11 @@ GLuint CompileShaders()
 
     layout (location = 0) in vec3 pos;
 
+    uniform float xMove;
+
     void main()
     {
-        gl_Position = vec4(pos, 1.0);
+        gl_Position = vec4(pos.x + xMove, pos.y, pos.z, 1.0);
     }
     )===";
     AddShader(shader, vertexShader, GL_VERTEX_SHADER);
@@ -60,9 +68,8 @@ GLuint CompileShaders()
     )===";
     AddShader(shader, fragmentShader, GL_FRAGMENT_SHADER);
 
-    glLinkProgram(shader);
-
     GLint result = 0;
+    glLinkProgram(shader);
     glGetProgramiv(shader, GL_LINK_STATUS, &result);
     if (!result)
     {
@@ -73,7 +80,6 @@ GLuint CompileShaders()
     }
 
     glValidateProgram(shader);
-
     glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);
     if (!result)
     {
@@ -82,6 +88,8 @@ GLuint CompileShaders()
         std::cerr << "Error validating program: " << errorLog << std::endl;
         return 0;
     }
+
+    uniformXMove = glGetUniformLocation(shader, "xMove");
 
     return shader;
 }
@@ -126,9 +134,9 @@ int main()
     glViewport(0, 0, bufferWidth, bufferHeight);
 
     GLfloat verticesPositions[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f};
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f, 0.5f, 0.0f};
 
     GLuint VAO;
     glGenVertexArrays(1, &VAO);
@@ -151,15 +159,31 @@ int main()
     {
         glfwPollEvents();
 
+        if (direction)
+        {
+            triOffset += triIncrement;
+        }
+        else
+        {
+            triOffset -= triIncrement;
+        }
+
+        if (abs(triOffset) >= triMaxoffset)
+        {
+            direction = !direction;
+        }
+
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glUseProgram(shader);
+
+        glUniform1f(uniformXMove, triOffset);
+
         glBindVertexArray(VAO);
-
         glDrawArrays(GL_TRIANGLES, 0, 3);
-
         glBindVertexArray(0);
+
         glUseProgram(0);
 
         glfwSwapBuffers(mainWindow);
