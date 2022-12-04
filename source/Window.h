@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -10,6 +12,16 @@ private:
 
     GLint width, height;
     GLint bufferWidth, bufferHeight;
+
+    std::array<bool, 1024> keyboardKeys;
+    static void handleKeys(GLFWwindow* window, int key, int code, int action, int mode);
+
+    std::array<GLfloat, 2> mouseLastPosition;
+    std::array<GLfloat, 2> mouseChange;
+    bool mouseFocused;
+    static void handleMousePosition(GLFWwindow* window, double x, double y);
+
+    GLfloat getMouseChange(int coord);
 
 public:
     Window(GLint windowWidth, GLint windowHeight);
@@ -23,4 +35,9 @@ public:
     bool getShouldClose();
 
     void swapBuffers();
+
+    std::array<bool, 1024> getKeys();  // TODO: Improve this with design patterns
+
+    GLfloat getXChange();
+    GLfloat getYChange();
 };
